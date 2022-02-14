@@ -22,7 +22,7 @@ namespace SkyCommerce.Site.Controllers
 
 
         [HttpGet]
-        [Authorize]
+        [Authorize] // A própria integração com o OpenId Connect entende que o usuário não está logado e redireciona para o IS4
         [Route("entrar")]
         public IActionResult Login(string returnUrl = null)
         {

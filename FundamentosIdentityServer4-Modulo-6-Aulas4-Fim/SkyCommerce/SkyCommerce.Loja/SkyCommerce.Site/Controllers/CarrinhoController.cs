@@ -41,9 +41,12 @@ namespace SkyCommerce.Site.Controllers
         public async Task<IActionResult> Index()
         {
             var carrinho = await _carrinhoStore.ObterCarrinho(User.Identity.Name);
+            // Pega o valor da claim de cargo. Mas tem que estar configurado no IS4: Resources > Identity Resources > User Profile > Claims > adicionar cargo 
             var cargodoUsuario = User.Claims.FirstOrDefault(f => f.Type.Equals("Cargo"));
             
+            // Pega o token do usuário
             var at = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+            
             var fretes = await _freteService.CalcularCarrinho(carrinho, await _geoposicaoService.GeolocalizarUsuario(), at);
             return View(new CarrinhoViewModel()
             {

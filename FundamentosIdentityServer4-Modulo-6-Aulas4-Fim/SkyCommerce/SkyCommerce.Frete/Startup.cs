@@ -26,18 +26,23 @@ namespace SkyCommerce.Fretes
             services.AddDbContext<FreteContext>(options => options.UseInMemoryDatabase("frete-context"));
 
             services.AddAuthentication("Bearer")
-                .AddOAuth2Introspection("Bearer",
-                    options =>
-                    {
-                        options.Authority = "https://localhost:5001";
-                        options.ClientSecret = "b741982cf8f943aa87a38e3d2923de40";
-                        options.ClientId = "api_frete";
-                    });
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://localhost:5001"; // Endereço do IS4
+                    options.Audience = "api_frete";
+                });
+                // .AddOAuth2Introspection("Bearer",
+                //     options =>
+                //     {
+                //         options.Authority = "https://localhost:5001"; // Endereço do IS4
+                //         options.ClientSecret = "b741982cf8f943aa87a38e3d2923de40";
+                //         options.ClientId = "api_frete";
+                //     });
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API de Fretes", Version = "v1" });
-                // add JWT Authentication
+                // adiciona JWT no OpenApi
                 var securityScheme = new OpenApiSecurityScheme
                 {
                     Name = "JWT Authentication",

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,10 +32,15 @@ namespace SkyCommerce.Site
         {
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
-            services.AddHttpContextAccessor();
+            
+            services.AddHttpContextAccessor(); // Tem que ter esse cara aqui também
 
-            JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
-            IdentityModelEventSource.ShowPII = true;
+            JwtSecurityTokenHandler.DefaultMapInboundClaims = false; // Para o aspnet core não associar os schemas xml aos nomes defaults das claims
+            
+            if(Debugger.IsAttached)
+                IdentityModelEventSource.ShowPII = true;
+            
+            // Integração com o OpenId Connect
             services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = "Cookies";
@@ -43,17 +49,21 @@ namespace SkyCommerce.Site
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
-                    options.Authority = "https://localhost:5001";
+                    options.Authority = "https://localhost:5001"; // URL do meu SSO
 
-                    options.ClientId = "715000d0c10040258c1be259c09e3b91";
-                    options.ClientSecret = "360ceac2e80545dca6083fef4f94d09f";
-                    options.ResponseType = "code";
+                    options.ClientId = "f23f4ee8810b474faec9c0bf1ef7319c";
+                    options.ClientSecret = "20bfac9530e444719d71231695565d59";
+                    options.ResponseType = "code"; // Qual o flow de autenticação que eu estou usando (code é o Authorization Code)
+                    // Scopes são informações do usuário que eu quero retornar do IS4
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
                     options.Scope.Add("api_frete");
-                    options.Scope.Add("company_info");
+                    //options.Scope.Add("company_info");
                     options.GetClaimsFromUserInfoEndpoint = true;
-                    options.SaveTokens = true;
+                    options.SaveTokens = true; // O ASP.NET Core salva o access token que ele pegou no IS4 no cookie do usuário
+                    // e ele faz o gerenciamento de access token através da biblioteca o OpenId Connect.
+                    
+                    // Retorna os dados das claims indicadas
                     options.Events.OnUserInformationReceived = context =>
                     {
                         options.ClaimActions.MapUniqueJsonKey("Cargo", "Cargo");
@@ -62,8 +72,8 @@ namespace SkyCommerce.Site
                     };
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        NameClaimType = "name",
-                        RoleClaimType = "role",
+                        NameClaimType = "name", // Nome da role que vai conter o nome do usuário
+                        RoleClaimType = "role", // Qual claim que vai conter as roles do usuário
 
                     };
                 });
@@ -93,7 +103,7 @@ namespace SkyCommerce.Site
                 app.UseHsts();
             }
 
-            // Definindo a cultura padr�o: pt-BR
+            // Definindo a cultura padr�o: pt-BR
             var supportedCultures = new[] { new CultureInfo("pt-BR") };
             app.UseRequestLocalization(new RequestLocalizationOptions
             {

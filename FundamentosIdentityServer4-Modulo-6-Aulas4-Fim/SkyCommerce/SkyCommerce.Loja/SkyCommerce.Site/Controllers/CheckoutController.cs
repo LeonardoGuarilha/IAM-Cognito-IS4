@@ -97,7 +97,9 @@ namespace SkyCommerce.Site.Controllers
         {
             var carrinho = await _carrinhoStore.ObterCarrinho(User.Identity.Name);
 
+            // Pega o token do usuário
             var at = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+            
             var fretes = await _freteService.CalcularCarrinho(carrinho, await _geoposicaoService.GeolocalizarUsuario(), at);
             return View(new CheckoutViewModel()
             {

@@ -24,6 +24,7 @@ namespace SkyCommerce.Services
         }
 
 
+        // O Token vem do Frontend MVC, lá tem uma propriedade SaveTokens = true;
         public Task<IEnumerable<DetalhesFrete>> ObterModalidades(string token)
         {
             var freteApi = RestService.For<IFreteApi>("https://localhost:5007");

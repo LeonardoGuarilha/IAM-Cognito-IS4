@@ -10,6 +10,7 @@ namespace Parceiro.BackgroundService
     {
         static async Task Main(string[] args)
         {
+            // Vou dar acesso a esse "parceiro" na minha api de frete
             var client = new HttpClient();
 
             var disco = await client.GetDiscoveryDocumentAsync("https://localhost:5001");
